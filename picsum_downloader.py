@@ -11,6 +11,9 @@ avgRgbValsOfAllImages = []
 
 url = f"https://picsum.photos/{photo_resolution}"
 
+with open("avg_rgb_values.txt", "w") as file:
+    file.write("")
+
 for i in range(0,number_of_images):
 
     urllib.request.urlretrieve(url, f"picsumImg{i}.png")
@@ -35,16 +38,19 @@ for i in range(0,number_of_images):
 
     counter = 0
 
-    for val in rgb_values:
-        totalRgbValues = (totalRgbValues[0] + val[0], totalRgbValues[1] + val[1], totalRgbValues[2] + val[2])
+    
 
-        counter+=1
+    with open("avg_rgb_values.txt", "a") as file:
+        for val in rgb_values:
+            totalRgbValues = (totalRgbValues[0] + val[0], totalRgbValues[1] + val[1], totalRgbValues[2] + val[2])
 
-    averageRgbValues = (int(totalRgbValues[0] / counter), int(totalRgbValues[1] / counter), int(totalRgbValues[2] / counter))
+            counter+=1
 
-    avgRgbValsOfAllImages.append(averageRgbValues)
+        #averageRgbValues = (int(totalRgbValues[0] / counter), int(totalRgbValues[1] / counter), int(totalRgbValues[2] / counter))
+
+    
+        
+        file.write(f"{(int(totalRgbValues[0] / counter), int(totalRgbValues[1] / counter), int(totalRgbValues[2] / counter))}\n")
 
     #print(avgRgbValsOfAllImages)
 
-with open("avg_rgb_values.txt", "w") as file:
-    file.write(f"{avgRgbValsOfAllImages}")
