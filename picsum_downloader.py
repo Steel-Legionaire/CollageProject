@@ -3,7 +3,7 @@ import urllib.request
 import numpy as np
 
 number_of_images = 10
-photo_resolution = 200
+photo_resolution = 50
 
 
 avgRgbValsOfAllImages = []
@@ -40,9 +40,11 @@ for i in range(0,number_of_images):
 
         counter+=1
 
-    averageRgbValues = (totalRgbValues[0] / counter, totalRgbValues[1] / counter, totalRgbValues[2] / counter)
+    averageRgbValues = (int(totalRgbValues[0] / counter), int(totalRgbValues[1] / counter), int(totalRgbValues[2] / counter))
 
     avgRgbValsOfAllImages.append(averageRgbValues)
 
+    #print(avgRgbValsOfAllImages)
+
 with open("avg_rgb_values.txt", "w") as file:
-    file.write(f"{averageRgbValues}")
+    file.write(f"{avgRgbValsOfAllImages}")
