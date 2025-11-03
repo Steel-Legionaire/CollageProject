@@ -2,23 +2,26 @@ from PIL import Image
 import urllib.request
 import numpy as np
 
-number_of_images = 10
-photo_resolution = 50
+number_of_images = 3000
+photo_resolution = 10
 
+startingIndex = 0
 
 avgRgbValsOfAllImages = []
 
 
 url = f"https://picsum.photos/{photo_resolution}"
 
-for i in range(0,number_of_images):
+for startingIndex in range(0,number_of_images):
 
-    urllib.request.urlretrieve(url, f"images/picsumImg{i}.png")
+    urllib.request.urlretrieve(url, f"images/picsumImg{startingIndex}.png")
 
-    img = Image.open(f"images/picsumImg{i}.png")
+    img = Image.open(f"images/picsumImg{startingIndex}.png")
+    print(f"{startingIndex+1}/{number_of_images}")
+
     #img.show()
 
-    with Image.open(f"images/picsumImg{i}.png") as img:
+    with Image.open(f"images/picsumImg{startingIndex}.png") as img:
         img = img.convert('RGB')
 
         # Retrieve the width and height of the image.
