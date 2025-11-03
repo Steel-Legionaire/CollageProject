@@ -13,12 +13,12 @@ url = f"https://picsum.photos/{photo_resolution}"
 
 for i in range(0,number_of_images):
 
-    urllib.request.urlretrieve(url, f"picsumImg{i}.png")
+    urllib.request.urlretrieve(url, f"images/picsumImg{i}.png")
 
-    img = Image.open(f"picsumImg{i}.png")
+    img = Image.open(f"images/picsumImg{i}.png")
     #img.show()
 
-    with Image.open(f"picsumImg{i}.png") as img:
+    with Image.open(f"images/picsumImg{i}.png") as img:
         img = img.convert('RGB')
 
         # Retrieve the width and height of the image.
@@ -46,5 +46,5 @@ for i in range(0,number_of_images):
 
     #print(avgRgbValsOfAllImages)
 
-with open("avg_rgb_values.txt", "w") as file:
+with open("images/avg_rgb_values.txt", "w") as file:
     file.write(f"{avgRgbValsOfAllImages}")
