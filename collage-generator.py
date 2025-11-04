@@ -12,7 +12,7 @@ import os
 startDate = datetime.now()
 
 # ====================== CONFIG ======================
-INPUT_IMAGE = "patrick.png"
+INPUT_IMAGE = "galaxy.png"
 INPUT_IMAGES_PATH = "testImages"
 #SCALE = 100 # How many images per pixel of the input image
 RESOLUTION = 5  # Size of each tile
@@ -140,7 +140,6 @@ savePath = f"{INPUT_IMAGE.strip(".png")}-collage.png"
 finalImg.save(savePath)
 finalImg.show()
 
-elapsedMinutes = (datetime.now() - startDate).total_seconds() / 60
+elapsedSeconds = (datetime.now() - startDate).total_seconds()
 
-
-print(f"\n✅ Elapsed Time: {elapsedMinutes:.2f} minutes")
+print(f"\n✅ Elapsed Time: {elapsedSeconds:.0f} seconds")
