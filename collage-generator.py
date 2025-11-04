@@ -13,9 +13,9 @@ startDate = datetime.now()
 
 # ====================== CONFIG ======================
 INPUT_IMAGE = "galaxy.png"
-INPUT_IMAGES_PATH = "images"
+INPUT_IMAGES_PATH = "testImages"
 #SCALE = 100 # How many images per pixel of the input image
-RESOLUTION = 5  # Size of each tile
+RESOLUTION = 25  # Size of each tile
 useCache = True
 # ====================================================
 
@@ -142,4 +142,4 @@ finalImg.show()
 
 elapsedSeconds = (datetime.now() - startDate).total_seconds()
 
-print(f"\n✅ Elapsed Time: {elapsedSeconds:.0f} seconds")
+print(f"\n✅ Elapsed Time: {elapsedSeconds:.2f} seconds")
