@@ -2,26 +2,46 @@ from PIL import Image
 import urllib.request
 import numpy as np
 
-number_of_images = 3000
-photo_resolution = 10
+def progress_bar(iteration, total, prefix='', suffix='', length=50, fill='█'):
+    """
+    Displays a progress bar in the terminal.
+    iteration: current iteration
+    total: total iterations
+    prefix: prefix string
+    suffix: suffix string
+    length: character length of the bar
+    fill: character used to fill the progress bar
+    """
+    percent = ("{0:.1f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    print ("\033[A \033[A")
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end="")
+
+
+
+number_of_images = 1000
+photo_resolution = 50
 
 startingIndex = 0
 
 avgRgbValsOfAllImages = []
 
+outputPath = "testImages"
 
 url = f"https://picsum.photos/{photo_resolution}"
 
 for startingIndex in range(0,number_of_images):
 
-    urllib.request.urlretrieve(url, f"images/picsumImg{startingIndex}.png")
+    urllib.request.urlretrieve(url, f"{outputPath}/picsumImg{startingIndex}.png")
 
-    img = Image.open(f"images/picsumImg{startingIndex}.png")
-    print(f"{startingIndex+1}/{number_of_images}")
+    img = Image.open(f"{outputPath}/picsumImg{startingIndex}.png")
+    progress_bar(startingIndex+1, number_of_images, prefix='Downloading:',suffix='Complete',length=40)
+    #print(f"{startingIndex+1}/{number_of_images}")
 
     #img.show()
 
-    with Image.open(f"images/picsumImg{startingIndex}.png") as img:
+    with Image.open(f"{outputPath}/picsumImg{startingIndex}.png") as img:
         img = img.convert('RGB')
 
         # Retrieve the width and height of the image.
@@ -49,5 +69,7 @@ for startingIndex in range(0,number_of_images):
 
     #print(avgRgbValsOfAllImages)
 
-with open("images/avg_rgb_values.txt", "w") as file:
+with open(f"{outputPath}/avg_rgb_values.txt", "w") as file:
     file.write(f"{avgRgbValsOfAllImages}")
+
+print("\n")
