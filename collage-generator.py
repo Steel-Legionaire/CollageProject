@@ -13,7 +13,7 @@ startDate = datetime.now()
 
 # ====================== CONFIG ======================
 INPUT_IMAGE = "galaxy.png"
-INPUT_IMAGES_PATH = "testImages"
+INPUT_IMAGES_PATH = "images"
 #SCALE = 100 # How many images per pixel of the input image
 RESOLUTION = 5  # Size of each tile
 useCache = True
