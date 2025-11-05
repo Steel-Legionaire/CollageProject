@@ -16,11 +16,26 @@ totalElapsedTime = datetime.now()
 INPUT_IMAGE = "baypath.png"
 INPUT_IMAGES_PATH = "images"
 #SCALE = 100 # How many images per pixel of the input image
-RESOLUTION = 1  # Size of each tile
+RESOLUTION = 5  # Size of each tile
 useCache = True
-useWebcam = False
+useWebcam = True
 openWindowWhenDone = False
 # ====================================================
+
+def spliceInputImage(img):
+
+    splicedImage = []
+    splicedCoords = []
+
+    for y in range(int(img.height/RESOLUTION)):
+        for x in range(int(img.width/RESOLUTION)):
+
+            # Crop image and convert and append
+            crop_dimensions = (x*RESOLUTION, y*RESOLUTION, x*RESOLUTION+RESOLUTION, y*RESOLUTION+RESOLUTION)
+            splicedImage.append(img.crop(crop_dimensions).convert('RGB'))
+            splicedCoords.append((x*RESOLUTION, y*RESOLUTION))
+            
+    return splicedImage, splicedCoords
 
 def getNextFrame(cap):
     ret, frame = cap.read()
@@ -164,38 +179,39 @@ def createCollage(img):
     tolerance = 10
     collageStart = datetime.now()
 
-    output_img = Image.new('RGB', (int(img.width/RESOLUTION)*RESOLUTION, int(img.height/RESOLUTION)*RESOLUTION))
+    outputWidth = int(img.width/RESOLUTION)*RESOLUTION
+    outputHeight = int(img.height/RESOLUTION)*RESOLUTION
 
-    for y in range(int(img.height/RESOLUTION)):
-        for x in range(int(img.width/RESOLUTION)):
+    output_img = Image.new('RGB', (outputWidth, outputHeight))
 
-            # Crop image and convert
-            crop_dimensions = (x*RESOLUTION, y*RESOLUTION, x*RESOLUTION+RESOLUTION, y*RESOLUTION+RESOLUTION)
-            cropped_image = img.crop(crop_dimensions)
-            cropped_image = cropped_image.convert('RGB')
+    splicedImageArr, splicedImageCoordsArr = spliceInputImage(img)
 
-            # Get its avg rgb
-            croppedImageAverageRgbValues = computeAvgRGB(cropped_image)
 
-            # Search for a best match
-            bestMatchIndex = findBestMatch(croppedImageAverageRgbValues, allRgbVals, tolerance)
-                
-            # Open and resize selected image
-            if(useCache):
-                selectedImg = cahcedImages[bestMatchIndex]
-            else:
-                selectedImg = Image.open(f"{INPUT_IMAGES_PATH}/picsumImg{bestMatchIndex}.png")
+    for i in range(len(splicedImageArr)):
+
+        # Get its avg rgb
+        croppedImageAverageRgbValues = computeAvgRGB(splicedImageArr[i])
+
+        # Search for a best match
+        bestMatchIndex = findBestMatch(croppedImageAverageRgbValues, allRgbVals, tolerance)
             
-            selectedImg = selectedImg.resize( (RESOLUTION, RESOLUTION) )
+        # Open and resize selected image
+        if(useCache):
+            selectedImg = cahcedImages[bestMatchIndex]
+        else:
+            selectedImg = Image.open(f"{INPUT_IMAGES_PATH}/picsumImg{bestMatchIndex}.png")
+        
+        selectedImg = selectedImg.resize( (RESOLUTION, RESOLUTION) )
 
-            # Paste it to the output
-            output_img.paste(selectedImg, (x*RESOLUTION, y*RESOLUTION))
-            
-            # Increment how many sections completed
-            completedNum+=1
+        # Paste it to the output
 
-            # Update the progress bar
-            progress_bar(completedNum, total, 'Generating:', 'Complete')     
+        output_img.paste(selectedImg, splicedImageCoordsArr[i])
+        
+        # Increment how many sections completed
+        completedNum+=1
+
+        # Update the progress bar
+        progress_bar(completedNum, total, 'Generating:', 'Complete')     
 
     elapsedSeconds = (datetime.now() - collageStart).total_seconds()
 
