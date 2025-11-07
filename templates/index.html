@@ -2,38 +2,79 @@
 <html>
   <head>
     <title> Collage Generator </title>
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+
     <script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
   </head>
   <body>
-    <h1>Upload an Image</h1>
+    <div class ="container">
+        <div class="text-center"><h1>Collage Generator</h1></div>
 
-    <form action="/" method="post" enctype="multipart/form-data">
-      <label for="file"> Input Image: </label>
-      <input type="file" name="file" accept="image/*" required> <br />
-      <label for="resolution"> Resolution: </label>
-      <input type="number" id="resolution" name="resolution" required> <br />
-      <button type="submit">Upload</button>
-    </form>
+        <div class="row">
+          <div class="col-lg-3 mx-auto mt-5">
+            <form action="/" method="post" enctype="multipart/form-data" id="uploadForm">
+              <div class="mb-3">
+                <label for="file" class="form-label"> Input Image: </label>
+                <input type="file" class="form-control" name="file" accept="image/*" required>
+              </div>
 
-    {% if uploaded_image %}
-      <h2>Original Image:</h2>
-      <img src="{{ uploaded_image }}" alt="Uploaded image" width="300">
-    {% endif %}
+              <div class="mb-3">
+                <label for="resolution" class="form-label"> Resolution: </label>
+                <input type="number" class="form-control" id="resolution" name="resolution" required>
+              </div>
 
-    {% if processed_image %}
-        <h2>Processed Image:</h2>
-
-        <div id="image-container" style="overflow: hidden; border: 1px solid #ccc;">   
-            <img id="zoomable-image" src="{{ processed_image }}" style="width: 100%; height: auto; display: block;">
+              <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+          </div>
         </div>
-    {% endif %}
 
+        <div class="row"><div class="col-lg-12 mx-auto w-25 mt-5 text-center" id="loadingGif"></div></div>
+        
+        {% if uploaded_image %}
+          <div class="row mt-5">
+            <div class="col-lg-12 text-center">
+              <h2>Original Image</h2>
+              <img src="{{ uploaded_image }}" alt="Uploaded image" width="300">
+            </div>
+          </div>
+        {% endif %}
+
+        {% if processed_image %}
+          <div class="row my-5">
+            <div class="col-lg-12 text-center">
+
+              <h2>Generated Collage</h2>
+              <div id="image-container" style="overflow: hidden; border: 1px solid #ccc;">   
+                  <img id="zoomable-image" src="{{ processed_image }}" style="width: 100%; height: auto; display: block;">
+              </div>
+
+            </div>
+          </div>
+        {% endif %}
+    </div>
+
+    <script>
+      const f = document.getElementById('uploadForm')
+      var d = document.getElementById('loadingGif')
+
+      f.addEventListener('submit', function(event) {
+        d.innerHTML = '<h3> Generating... </h3> <img src="static/images/loading.gif" class="" />';
+        
+      })
+
+      const doneLoading = "{{ done_loading }}";
+      if(doneLoading){
+        d.innerHTML = "";
+      }
+    </script>
 
     <script>
         const element = document.getElementById('zoomable-image');
         const panzoom = Panzoom(element, {
             maxScale: 100,
+            minScale: 1,
             contain: 'outside'
         });
 
@@ -41,5 +82,6 @@
         element.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   </body>
 </html>

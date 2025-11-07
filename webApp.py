@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from fastapi.concurrency import run_in_threadpool
+import uvicorn
 
 import io
 import os
@@ -16,6 +17,9 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+PORT = 8000
+HOST = "0.0.0.0"
+
 
 # Point FastAPI to your templates directory
 templates = Jinja2Templates(directory="templates")
@@ -23,7 +27,7 @@ templates = Jinja2Templates(directory="templates")
 # Define a simple route
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "message": "Hello, World!"})
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/", response_class=HTMLResponse)
 async def upload_image(request: Request, file: UploadFile = File(...), resolution: int = Form(...)):
@@ -46,5 +50,9 @@ async def upload_image(request: Request, file: UploadFile = File(...), resolutio
             "request": request,
             "uploaded_image": f"{save_path}",
             "processed_image": result_path,
+            "done_loading": True,
         },
     )
+    
+
+uvicorn.run(app, host=HOST, port=PORT)

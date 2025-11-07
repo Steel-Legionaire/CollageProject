@@ -300,7 +300,7 @@ if __name__ == "__main__":
 
         finalImg = createCollage(inputImg)
 
-        savePath = f"{INPUT_IMAGE.strip(".png")}-collage.png"
+        savePath = f"{INPUT_IMAGE.strip('.png')}-collage.png"
 
         finalImg.save(savePath)
 

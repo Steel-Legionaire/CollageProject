@@ -1,4 +1,7 @@
 
+static/processed/*.png
+*-collage.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
