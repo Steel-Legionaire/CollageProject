@@ -3,9 +3,6 @@ from PIL import Image, ImageTk
 import ast
 import numpy as np
 from datetime import datetime
-import threading
-import signal
-import sys
 import cv2
 import os
 import tkinter as tk
@@ -16,14 +13,13 @@ totalElapsedTime = datetime.now()
 # ====================== CONFIG ======================
 INPUT_IMAGE = "baypath.png"
 INPUT_IMAGES_PATH = "images"
-#SCALE = 100 # How many images per pixel of the input image
-RESOLUTION = 10  # Size of each tile
-useCache = True
+SCALE = 100 # Size of the collection images
+RESOLUTION = 2  # Size of each tile
 useWebcam = False
 openWindowWhenDone = False
 # ====================================================
 
-def spliceInputImage(img, res):
+def spliceInputImage(img, res, scale):
 
     splicedImage = []
     splicedCoords = []
@@ -34,7 +30,7 @@ def spliceInputImage(img, res):
             # Crop image and convert and append
             crop_dimensions = (x*res, y*res, x*res+res, y*res+res)
             splicedImage.append(img.crop(crop_dimensions).convert('RGB'))
-            splicedCoords.append((x*res, y*res))
+            splicedCoords.append((x*scale, y*scale))
             
     return splicedImage, splicedCoords
 
@@ -90,8 +86,6 @@ def videoFeed(width, height):
 
     root.mainloop()
 
-
-
 def openWindow(width, height, img):
     # Create the main window (root window)
     root = tk.Tk()
@@ -138,7 +132,6 @@ def cacheInputImages():
     
     return cache
 
-
 def computeAvgRGB(img):
 
     # Convert img to a numpy array
@@ -173,21 +166,35 @@ def findBestMatch(avg_rgb, all_rgb_vals, tolerance):
         # If no match is found, increase tolerance
         tolerance += 5
 
-
-def createCollage(img):
-    
+def createCollage(img, res = RESOLUTION, scale=SCALE):
     completedNum = 0
     tolerance = 10
-    collageStart = datetime.now()
 
-    outputWidth = int(img.width/RESOLUTION)*RESOLUTION
-    outputHeight = int(img.height/RESOLUTION)*RESOLUTION
+    res = abs(res)
+
+    print(f"Res: {res}, Scale: {scale}")
+
+    if(res == 0):
+        return "static/images/error.png"
+
+    total = (int(img.height/res) * int(img.width/res))
+
+    multiplyer = scale // res # How much bigger the output image will be compared to original
+
+    print(multiplyer)
+
+    outputWidth = (int(img.width / res) * res) * multiplyer
+    outputHeight = (int(img.height / res) * res) * multiplyer
 
     output_img = Image.new('RGB', (outputWidth, outputHeight))
 
-    splicedImageArr, splicedImageCoordsArr = spliceInputImage(img, RESOLUTION)
 
+    splicedImageArr, splicedImageCoordsArr = spliceInputImage(img, res, scale)
+
+    cahcedImages = cacheInputImages()
     
+
+    collageStart = datetime.now()
 
     for i in range(len(splicedImageArr)):
 
@@ -198,12 +205,10 @@ def createCollage(img):
         bestMatchIndex = findBestMatch(croppedImageAverageRgbValues, allRgbVals, tolerance)
             
         # Open and resize selected image
-        if(useCache):
-            selectedImg = cahcedImages[bestMatchIndex]
-        else:
-            selectedImg = Image.open(f"{INPUT_IMAGES_PATH}/picsumImg{bestMatchIndex}.png")
-        
-        selectedImg = selectedImg.resize( (RESOLUTION, RESOLUTION) )
+
+        selectedImg = cahcedImages[bestMatchIndex]
+
+        selectedImg = selectedImg.resize( (scale, scale ) )
 
         # Paste it to the output
 
@@ -221,25 +226,31 @@ def createCollage(img):
 
     return output_img  
 
-def createAndSaveCollage(img, res):
+def createAndSaveCollage(img, res, scale):
     """ Intended for use with the web app """
     completedNum = 0
     tolerance = 10
 
     res = abs(res)
 
+    print(f"Res: {res}, Scale: {scale}")
+
     if(res == 0):
         return "static/images/error.png"
 
     total = (int(img.height/res) * int(img.width/res))
 
-    outputWidth = int(img.width/res)*res
-    outputHeight = int(img.height/res)*res
+    multiplyer = scale // res # How much bigger the output image will be compared to original
+
+    print(multiplyer)
+
+    outputWidth = (int(img.width / res) * res) * multiplyer
+    outputHeight = (int(img.height / res) * res) * multiplyer
 
     output_img = Image.new('RGB', (outputWidth, outputHeight))
 
 
-    splicedImageArr, splicedImageCoordsArr = spliceInputImage(img, res)
+    splicedImageArr, splicedImageCoordsArr = spliceInputImage(img, res, scale)
 
     cahcedImages = cacheInputImages()
     
@@ -255,12 +266,10 @@ def createAndSaveCollage(img, res):
         bestMatchIndex = findBestMatch(croppedImageAverageRgbValues, allRgbVals, tolerance)
             
         # Open and resize selected image
-        if(useCache):
-            selectedImg = cahcedImages[bestMatchIndex]
-        else:
-            selectedImg = Image.open(f"{INPUT_IMAGES_PATH}/picsumImg{bestMatchIndex}.png")
-        
-        selectedImg = selectedImg.resize( (res, res ) )
+
+        selectedImg = cahcedImages[bestMatchIndex]
+
+        selectedImg = selectedImg.resize( (scale, scale ) )
 
         # Paste it to the output
 
@@ -292,6 +301,8 @@ def createAndSaveCollage(img, res):
 with open(f"{INPUT_IMAGES_PATH}/avg_rgb_values.txt", "r") as file:
     allRgbVals = ast.literal_eval(file.readline())
 
+cahcedImages = cacheInputImages()
+
 if __name__ == "__main__":
     inputImg = Image.open(INPUT_IMAGE)
 
@@ -299,10 +310,6 @@ if __name__ == "__main__":
         total = (int(inputImg.height/RESOLUTION) * int(inputImg.width/RESOLUTION)) // 3
     else:
         total = (int(inputImg.height/RESOLUTION) * int(inputImg.width/RESOLUTION))
-
-    if(useCache):
-        cahcedImages = cacheInputImages()
-
 
     if(useWebcam):
         videoFeed(640, 480)
