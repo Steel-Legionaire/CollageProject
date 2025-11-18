@@ -11,10 +11,10 @@ import tkinter as tk
 totalElapsedTime = datetime.now()
 
 # ====================== CONFIG ======================
-INPUT_IMAGE = "baypath.png"
+INPUT_IMAGE = "helldiver.png"
 INPUT_IMAGES_PATH = "images"
-SCALE = 100 # Size of the collection images
-RESOLUTION = 2  # Size of each tile
+SCALE = 250 # Size of the collection images
+RESOLUTION = 3  # Size of each tile
 useWebcam = False
 openWindowWhenDone = False
 # ====================================================
@@ -315,16 +315,16 @@ if __name__ == "__main__":
         videoFeed(640, 480)
     else:
 
-        finalImg = createCollage(inputImg)
+        npImage = np.array(createCollage(inputImg))
+
+        finalImg = cv2.cvtColor(npImage, cv2.COLOR_RGB2BGR)
 
         savePath = f"{INPUT_IMAGE.strip('.png')}-collage.png"
 
-        finalImg.save(savePath)
+        cv2.imwrite(savePath, finalImg)
 
-        if openWindowWhenDone:
-            openWindow(finalImg.width, finalImg.height, finalImg)
-        else:
-            finalImg.show()
+        #if openWindowWhenDone:
+        #    openWindow(finalImg.width, finalImg.height, finalImg)
 
         elapsedSeconds = (datetime.now() - totalElapsedTime).total_seconds()
         print(f"\n✅ Total Elapsed Time: {elapsedSeconds:.2f} seconds") 
